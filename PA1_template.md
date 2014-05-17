@@ -21,7 +21,7 @@ This step consists of following:
 
 ```r
 # 1.1
-activity = read.csv("C:/Users/LenovoJ/Desktop/repos/RepData_PeerAssessment1/activity/activity.csv")
+activity = read.csv("./activity/activity.csv")
 # 1.2
 activity$date = as.Date(activity$date, "%Y-%m-%d")
 # 1.3
@@ -49,9 +49,12 @@ head(activity)
 
 This step consists of the following:
 * 2.1 Compute data frame presenting total number of steps by day
-* 2.2 Plot histogram of total number of steps across day
-* 2.3 Compute data frame presenting mean number of steps by day
-* 2.4 Compute data frame presenting median number of steps by day
+* 2.2a Plot histogram of total number of steps per day (Interpretation 1)
+* 2.3a Compute mean total number of steps per day (Interpretation 1)
+* 2.4a Compute median total number of steps per day (Interpretation 1)
+* 2.2b Plot histogram for number of steps across days (Interpretation 2)
+* 2.3b Compute data frame presenting mean number of steps across days (Interpretation 2)
+* 2.4b Compute data frame presenting median number of steps across days (Interpretation 2)
 
 
 ```r
@@ -61,20 +64,55 @@ library(lattice)
 activitymelt = melt(activitycleaned, id = c("date"), measure.vars = c("steps"))
 activitydcastsum = dcast(activitymelt, date ~ variable, sum)
 
-# 2.2
-plot(activitydcastsum$date, activitydcastsum$steps, type = "h", xlab = "Day", 
-    ylab = "Sum of Steps", main = "Histogram for Sum of Steps by Day")
+# 2.2a
+hist(activitydcastsum$steps, col = "blue", xlab = "Total Steps per Day", ylab = "Frequency", 
+    main = "Histogram of Total Steps taken per Day")
 ```
 
-![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3.png) 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-31.png) 
 
 ```r
 
-# 2.3
+# 2.2a
+meantotalsteps = mean(activitydcastsum$steps)
+
+# Compute Mean Total Number of Steps per Day
+meantotalsteps
+```
+
+```
+## [1] 10766
+```
+
+```r
+
+# 2.4a
+mediantotalsteps = median(activitydcastsum$steps)
+
+# Compute Median Total Number of Steps per Day
+mediantotalsteps
+```
+
+```
+## [1] 10765
+```
+
+```r
+
+# 2.2b
+plot(activitydcastsum$date, activitydcastsum$steps, type = "h", xlab = "Day", 
+    ylab = "Sum of Steps", main = "Histogram for Sum of Steps across Days")
+```
+
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-32.png) 
+
+```r
+
+# 2.3b
 activitydcastmean = dcast(activitymelt, date ~ variable, mean)
 ameanbyday = activitydcastmean
 
-# 2.4
+# 2.4b
 activitymelt$value = as.double(activitymelt$value)
 activitydcastmedian = dcast(activitymelt, date ~ variable, median)
 amedianbyday = activitydcastmedian
@@ -128,8 +166,6 @@ head(amedianbyday)
 ```
 
 
-
-
 ## Step 3: What is the average daily activity pattern?
 
 This step consists of the following:
@@ -170,7 +206,8 @@ This step consists of the following:
 * 4.1 Find the number of rows with NA
 * 4.2 Fill in missing values with the mean number of steps for the respective intervals
 * 4.3 Compute new data frame with the missing values filled in
-* 4.4 Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.
+* 4.4a Make a histogram of the total number of steps taken each day and Calculate and report the mean and median total number of steps taken per day.(Interpretation1)
+* 4.4b Make a histogram of the total number of steps taken across days and Calculate and report the mean and median total number of steps taken across days.(Interpretation 2)
 
 
 ```r
@@ -201,25 +238,55 @@ newdata = activity
 newdata$steps = newdata$filledsteps
 newdata = newdata[, 1:3]
 
-
 # 4.4
 newdatamelt = melt(newdata, id = c("date"), measure.vars = c("steps"))
 newdatadcastsum = dcast(newdatamelt, date ~ variable, sum)
 
-# Plot histogram for Sum of Steps per day
+# 4.4a Plot histogram for Sum of Steps per day
+hist(newdatadcastsum$steps, col = "red", xlab = "Total Number of Steps", ylab = "Frequency", 
+    main = "Histogram for Total Number of Steps per Day (Missing Values Filled)")
+```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-61.png) 
+
+```r
+
+# Compute mean total number of steps per day
+meantotalstepsnafilled = mean(newdatadcastsum$steps)
+meantotalstepsnafilled
+```
+
+```
+## [1] 10766
+```
+
+```r
+
+# Compute median total number of steps per day
+mediantotalstepsnafilled = median(newdatadcastsum$steps)
+mediantotalstepsnafilled
+```
+
+```
+## [1] 10766
+```
+
+```r
+
+# 4.4b Plot histogram for Sum of Steps across days
 plot(newdatadcastsum$date, newdatadcastsum$steps, type = "h", xlab = "Day", 
     ylab = "Sum of Steps", main = "Histogram for Sum of Steps by Day (Missing Values Filled)")
 ```
 
-![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6.png) 
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-62.png) 
 
 ```r
 
-# Data frame for mMean steps per day
+# Data frame for mMean steps across days
 newdatadcastmean = dcast(newdatamelt, date ~ variable, mean)
 newmeanbyday = newdatadcastmean
 
-# Data frame for median steps per day
+# Data frame for median steps across days
 newdatamelt$value = as.double(newdatamelt$value)
 newdatadcastmedian = dcast(newdatamelt, date ~ variable, median)
 newmedianbyday = newdatadcastmedian
